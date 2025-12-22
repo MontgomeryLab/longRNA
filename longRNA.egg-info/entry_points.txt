@@ -1,0 +1,2 @@
+[console_scripts]
+longRNA = longRNA.entry:main

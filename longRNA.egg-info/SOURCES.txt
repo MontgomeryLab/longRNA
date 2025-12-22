@@ -1,0 +1,11 @@
+setup.py
+longRNA/__init__.py
+longRNA/entry.py
+longRNA.egg-info/PKG-INFO
+longRNA.egg-info/SOURCES.txt
+longRNA.egg-info/dependency_links.txt
+longRNA.egg-info/entry_points.txt
+longRNA.egg-info/not-zip-safe
+longRNA.egg-info/requires.txt
+longRNA.egg-info/top_level.txt
+longRNA/scripts/__init__.py

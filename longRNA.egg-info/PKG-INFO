@@ -1,0 +1,171 @@
+Metadata-Version: 2.4
+Name: longRNA
+Version: 1.0.0
+Summary: RNA-seq Analysis Pipeline - Salmon and RSEM workflows
+Author: shliu
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: Unix
+Requires-Python: >=3.7.0
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml>=5.1
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# RNA-seq Analysis Pipeline
+
+This directory contains two CWL-based RNA-seq pipelines: **Salmon** (fast, pseudo-alignment) and **RSEM + STAR** (slower, full alignment).
+
+## Quick Start
+
+### Running Salmon Pipeline (Fast, ~30 min for 8 samples)
+
+1. Edit file paths: `path_salmon.yml`
+2. Edit parameters: `config_salmon.yml`
+3. Run: `python3 runcwl_salmon.py`
+
+### Running RSEM Pipeline (Slow, ~6 hours for 8 samples)
+
+1. Edit file paths: `path_rsem.yml`
+2. Edit parameters: `config_rsem.yml`
+3. Run: `python3 runcwl_rsem.py`
+
+## File Structure
+
+```
+rnaseqpipeline/
+├── path_salmon.yml          # Salmon: Input FASTQ files, reference files
+├── config_salmon.yml         # Salmon: Pipeline parameters (threads, thresholds)
+├── path_rsem.yml            # RSEM: Input FASTQ files, reference files
+├── config_rsem.yml          # RSEM: Pipeline parameters (threads, thresholds)
+├── runcwl_salmon.py         # Salmon pipeline runner
+├── runcwl_rsem.py           # RSEM pipeline runner
+├── cwl/                     # CWL workflow definitions (don't edit)
+│   ├── workflows/
+│   └── tools/
+└── old_scripts/             # Backup of old auto-generation scripts
+```
+
+## Configuration Files
+
+### Path Files (`path_salmon.yml` / `path_rsem.yml`)
+
+Contains **file locations**:
+- Input FASTQ files (R1 and R2)
+- Sample names and experimental groups
+- Reference genome/transcriptome files
+- Output directory
+
+**Edit these when**: You want to analyze different samples or use different references.
+
+### Config Files (`config_salmon.yml` / `config_rsem.yml`)
+
+Contains **pipeline parameters**:
+- Thread counts for parallelization
+- Quality filtering thresholds (fastp)
+- Alignment/quantification settings
+- DESeq2 statistical thresholds (alpha, log2FC)
+
+**Edit these when**: You want to adjust analysis parameters or computational resources.
+
+## How It Works
+
+1. **You edit**: `path_*.yml` and `config_*.yml`
+2. **Runner script merges** them into `processed_config_*.yml`
+3. **CWL workflow** reads the merged config and runs the pipeline
+4. **Results** are saved to `salmon_results/` or `rsem_results/`
+
+## Pipeline Steps
+
+### Salmon Pipeline
+```
+fastp (QC) → Salmon (quantification) → DESeq2 (differential expression)
+```
+
+### RSEM + STAR Pipeline
+```
+fastp (QC) → RSEM + STAR (alignment & quantification) → DESeq2 (differential expression)
+```
+
+## Output Structure
+
+### Salmon Results (`salmon_results/`)
+```
+salmon_results/
+├── fastp_cleaned/          # Quality-filtered FASTQ files
+├── salmon_quants/          # Gene/transcript abundance estimates
+├── analysis_results/       # DESeq2 results & plots
+└── gene_counts/            # Raw & normalized count matrices
+```
+
+### RSEM Results (`rsem_results/`)
+```
+rsem_results/
+├── fastp_cleaned/          # Quality-filtered FASTQ files
+├── rsem_quants/            # Gene/transcript abundance estimates
+├── rsem_bams/              # BAM alignment files (for visualization)
+├── analysis_results_rsem/  # DESeq2 results & plots
+└── gene_counts_rsem/       # Raw & normalized count matrices
+```
+
+## Key Parameters Explained
+
+### Quality Control (fastp)
+- `fastp_threads`: Number of CPU cores (default: 16)
+- `qualified_quality_phred`: Minimum base quality score (default: 20)
+- `length_required`: Minimum read length after trimming (default: 20)
+
+### Quantification
+- **Salmon**:
+  - `salmon_threads`: CPU cores (default: 32)
+  - `library_type`: A (auto-detect), SR (single-end), etc.
+
+- **RSEM + STAR**:
+  - `rsem_threads`: CPU cores (default: 32)
+  - `rsem_sjdboverhang`: Read length - 1 (e.g., 149 for 150bp reads)
+  - `rsem_genomeSAindexNbases`: 12 for small genomes, 14 for human
+  - `rsem_forward_prob`: 0.0 (unstranded), 1.0 (stranded)
+
+### Differential Expression (DESeq2)
+- `alpha`: FDR threshold for significance (default: 0.05 = 5%)
+- `lfc_threshold`: Minimum log2 fold-change (default: 1.0 = 2-fold change)
+
+## Tips
+
+1. **Choose your pipeline**:
+   - Use **Salmon** for quick results and good accuracy
+   - Use **RSEM + STAR** when you need BAM files for visualization
+
+2. **Adjust threads** based on your system:
+   - Check CPU cores: `lscpu | grep "^CPU(s):"`
+   - Set `fastp_threads` and `salmon_threads`/`rsem_threads` accordingly
+
+3. **Parameter recommendations**:
+   - For exploratory analysis: `alpha: 0.1`, `lfc_threshold: 0.5`
+   - For publication: `alpha: 0.05`, `lfc_threshold: 1.0`
+   - For high confidence hits: `alpha: 0.01`, `lfc_threshold: 1.5`
+
+## Troubleshooting
+
+**Pipeline fails immediately?**
+- Check that FASTQ file paths in `path_*.yml` are correct
+- Verify reference files exist
+
+**Out of memory errors?**
+- Reduce thread counts in config files
+- For RSEM: Ensure at least 15GB RAM available
+
+**Temporary files taking too much space?**
+- Check `/home/shliu/cwl_tmp` or `/mnt/exos20tb/cwl_tmp_rsem`
+- Delete manually: `rm -rf /home/shliu/cwl_tmp/*`
+
+## Migration from Old System
+
+If you have old `generate_config.py` or `generate_config_rsem.py` files:
+- These are no longer needed
+- Old scripts moved to `old_scripts/` folder
+- Edit `path_*.yml` and `config_*.yml` directly instead
