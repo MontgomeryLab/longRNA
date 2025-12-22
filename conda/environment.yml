@@ -1,0 +1,43 @@
+name: longRNA
+channels:
+- bioconda
+- conda-forge
+- defaults
+dependencies:
+- python>=3.10, <3.14
+- pyyaml>=5.1
+
+# CWL workflow engine
+- conda-forge::cwltool>=3.1
+
+# RNA-seq analysis tools
+- bioconda::fastp>=0.23.0
+- bioconda::salmon>=1.9.0
+- bioconda::rsem>=1.3.3
+- bioconda::star>=2.7.10
+
+# Differential expression analysis
+- bioconda::bioconductor-deseq2>=1.38.0
+- bioconda::bioconductor-tximport
+- conda-forge::r-base>=4.2.0
+- conda-forge::r-ggplot2
+- conda-forge::r-pheatmap
+- conda-forge::r-dplyr
+- conda-forge::r-tidyr
+- conda-forge::r-readr
+
+# Additional utilities
+- bioconda::samtools>=1.15
+- conda-forge::pandas>=1.5.0
+- conda-forge::numpy>=1.23.0
+- conda-forge::matplotlib>=3.5.0
+
+# Build tools
+- pip>=23.0
+- setuptools>=67.0
+
+# Set environment variables
+variables:
+  PYTHONNOUSERSITE: "1"
+
+

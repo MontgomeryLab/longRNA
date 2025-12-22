@@ -1,0 +1,5 @@
+Forward Reads,Reverse Reads,Sample/Group Name,Replicate Number,Control
+test_N2_rep1_R1.fq.gz,test_N2_rep1_R2.fq.gz,N2,1,TRUE
+test_N2_rep2_R1.fq.gz,test_N2_rep2_R2.fq.gz,N2,2,TRUE
+test_lin15b_rep1_R1.fq.gz,test_lin15b_rep1_R2.fq.gz,lin-15b,1,
+test_lin15b_rep2_R1.fq.gz,test_lin15b_rep2_R2.fq.gz,lin-15b,2,

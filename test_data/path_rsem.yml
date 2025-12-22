@@ -1,0 +1,53 @@
+##############################  RSEM TEST PIPELINE - FILE PATHS  ##############################
+workflow_file: ../longRNA/cwl/workflows/rnaseq_rsem_workflow.cwl
+config_file: config_rsem.yml
+merged_config_file: processed_config_rsem.yml
+
+tmp_directory: ./tmp_rsem
+cache_directory: ./cache_rsem
+
+sample_csv_file:
+  class: File
+  path: fastq/test_samples.csv
+
+in_fastq_r1:
+- class: File
+  path: fastq/test_N2_rep1_R1.fq.gz
+- class: File
+  path: fastq/test_N2_rep2_R1.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep1_R1.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep2_R1.fq.gz
+
+in_fastq_r2:
+- class: File
+  path: fastq/test_N2_rep1_R2.fq.gz
+- class: File
+  path: fastq/test_N2_rep2_R2.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep1_R2.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep2_R2.fq.gz
+
+sample_basenames:
+- test_N2_rep1
+- test_N2_rep2
+- test_lin15b_rep1
+- test_lin15b_rep2
+
+sample_groups:
+- N2
+- N2
+- lin-15b
+- lin-15b
+
+genome_fasta:
+  class: File
+  path: reference/test_genome_chrI.fa
+
+gtf_annotation:
+  class: File
+  path: reference/test_annotation_chrI.gtf
+
+run_directory: results_rsem

@@ -1,0 +1,58 @@
+##############################  SALMON PIPELINE - CONFIGURATION  ##############################
+#
+# This file contains all pipeline parameters for the Salmon RNA-seq pipeline.
+# Edit these values to customize the analysis.
+#
+# Pipeline steps: fastp (QC) → Salmon (quantification) → DESeq2 (differential expression)
+#
+######-------------------------------------------------------------------------------------######
+
+##-- Pipeline metadata --##
+run_name: rnaseq_salmon_analysis
+version: 1.0.0
+verbosity: normal    # Options: quiet, normal, debug
+
+##-- Temporary directory --##
+tmp_directory: /home/shliu/cwl_tmp    # Temporary directory for CWL intermediate files
+                                      # Can be absolute path or relative to this config file
+
+##-- Data type --##
+is_paired_end: true  # Set to false for single-end data
+
+##-- Output directory names --##
+dir_name_fastp: fastp_cleaned
+dir_name_salmon: salmon_quants
+dir_name_analysis: analysis_results
+dir_name_gene_counts: gene_counts
+
+##-- General threading --##
+threads: 8           # General thread count for pipeline coordination
+
+######------------------------------- FASTP (Quality Control) -------------------------------######
+# fastp performs adapter trimming, quality filtering, and generates QC reports
+######-------------------------------------------------------------------------------------######
+
+fastp_threads: 16                 # Number of threads for fastp
+qualified_quality_phred: 20       # Minimum phred quality score for a base to be qualified
+length_required: 20               # Minimum length of reads after trimming
+detect_adapter_for_pe: true       # Auto-detect adapters for paired-end reads
+trim_poly_x: true                 # Trim polyA/polyT/polyG/polyC tails (important for RNA-seq)
+trim_poly_g: true                 # Trim polyG tails (for NovaSeq/NextSeq platforms)
+
+######--------------------------------- SALMON (Quantification) -----------------------------######
+# Salmon performs quasi-mapping and quantification of transcript abundance
+######-------------------------------------------------------------------------------------######
+
+salmon_threads: 32                # Number of threads for Salmon
+library_type: A                   # Library type: A (auto-detect), SR (single-end), SF (stranded forward), etc.
+                                  # See: https://salmon.readthedocs.io/en/latest/library_type.html
+
+######------------------------------- DESeq2 (Differential Expression) ---------------------######
+# DESeq2 performs statistical analysis to identify differentially expressed genes
+######-------------------------------------------------------------------------------------######
+
+alpha: 0.05                       # FDR threshold (false discovery rate)
+                                  # Lower = stricter (e.g., 0.01), Higher = more lenient (e.g., 0.1)
+
+lfc_threshold: 1.0                # Log2 fold-change threshold for biological significance
+                                  # 1.0 = 2-fold change, 2.0 = 4-fold change, 0.5 = 1.4-fold change

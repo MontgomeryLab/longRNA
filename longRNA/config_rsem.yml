@@ -1,0 +1,79 @@
+##############################  RSEM PIPELINE - CONFIGURATION  ##############################
+#
+# This file contains all pipeline parameters for the RSEM + STAR RNA-seq pipeline.
+# Edit these values to customize the analysis.
+#
+# Pipeline steps: fastp (QC) → RSEM + STAR (alignment & quantification) → DESeq2 (differential expression)
+#
+######-------------------------------------------------------------------------------------######
+
+##-- Pipeline metadata --##
+run_name: rnaseq_rsem_exp2_glp4
+version: 1.0.0
+verbosity: normal    # Options: quiet, normal, debug
+
+##-- Temporary directory --##
+tmp_directory: /home/shliu/cwl_tmp_rsem    # Temporary directory for CWL intermediate files
+                                     # Can be absolute path or relative to this config file
+
+##-- Data type --##
+is_paired_end: true  # Set to false for single-end data
+
+##-- Output directory names --##
+dir_name_fastp: fastp_cleaned
+dir_name_rsem: rsem_quants
+dir_name_rsem_bams: rsem_bams
+dir_name_rsem_logs: rsem_logs
+dir_name_analysis: analysis_results_rsem
+dir_name_gene_counts: gene_counts_rsem
+
+##-- General threading --##
+threads: 32           # General thread count for pipeline coordination
+
+######------------------------------- FASTP (Quality Control) -------------------------------######
+# fastp performs adapter trimming, quality filtering, and generates QC reports
+######-------------------------------------------------------------------------------------######
+
+fastp_threads: 32                 # Number of threads for fastp
+qualified_quality_phred: 20       # Minimum phred quality score for a base to be qualified
+length_required: 20               # Minimum length of reads after trimming
+detect_adapter_for_pe: true       # Auto-detect adapters for paired-end reads
+trim_poly_x: true                 # Trim polyA/polyT/polyG/polyC tails (important for RNA-seq)
+trim_poly_g: true                 # Trim polyG tails (for NovaSeq/NextSeq platforms)
+
+######------------------------------- RSEM + STAR (Alignment & Quantification) --------------######
+# RSEM uses STAR for alignment and performs gene/transcript quantification
+# STAR parameters are optimized for splice-aware alignment
+######-------------------------------------------------------------------------------------######
+
+rsem_threads: 32                  # Number of threads for RSEM/STAR
+rsem_reference_name: rsem_star_index  # Prefix name for RSEM index (will be created)
+
+##-- STAR alignment parameters --##
+rsem_sjdboverhang: 149            # Read length - 1 (for 150bp reads)
+                                  # Adjust based on your sequencing read length:
+                                  # 75bp reads → 74, 100bp reads → 99, 150bp reads → 149
+
+rsem_genomeSAindexNbases: 12      # Genome index parameter for small genomes
+                                  # C. elegans (100 Mb) → 12, Human (3 Gb) → 14
+
+##-- Library strandedness --##
+rsem_forward_prob: 0.0            # Library type: 0.0 = unstranded, 1.0 = forward stranded
+                                  # Most standard protocols are unstranded (0.0)
+
+##-- Read mapping stringency --##
+perfect_match_only: false          # Only allow perfectly matching reads (no mismatches)
+                                  # true = only perfect matches, false = allow mismatches (default)
+
+unique_mappers_only: false         # Only allow uniquely mapping reads (single location)
+                                  # true = unique mappers only, false = allow multi-mappers (default)
+
+######------------------------------- DESeq2 (Differential Expression) ---------------------######
+# DESeq2 performs statistical analysis to identify differentially expressed genes
+######-------------------------------------------------------------------------------------######
+
+alpha: 0.05                       # FDR threshold (false discovery rate)
+                                  # Lower = stricter (e.g., 0.01), Higher = more lenient (e.g., 0.1)
+
+lfc_threshold: 1.0                # Log2 fold-change threshold for biological significance
+                                  # 1.0 = 2-fold change, 2.0 = 4-fold change, 0.5 = 1.4-fold change

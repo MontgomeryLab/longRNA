@@ -1,0 +1,55 @@
+##############################  SALMON TEST PIPELINE - FILE PATHS  ##############################
+workflow_file: ../longRNA/cwl/workflows/rnaseq_salmon_workflow.cwl
+config_file: config_salmon.yml
+merged_config_file: processed_config_salmon.yml
+
+tmp_directory: ./tmp_salmon
+cache_directory: ./cache_salmon
+
+sample_csv_file:
+  class: File
+  path: fastq/test_samples.csv
+
+in_fastq_r1:
+- class: File
+  path: fastq/test_N2_rep1_R1.fq.gz
+- class: File
+  path: fastq/test_N2_rep2_R1.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep1_R1.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep2_R1.fq.gz
+
+in_fastq_r2:
+- class: File
+  path: fastq/test_N2_rep1_R2.fq.gz
+- class: File
+  path: fastq/test_N2_rep2_R2.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep1_R2.fq.gz
+- class: File
+  path: fastq/test_lin15b_rep2_R2.fq.gz
+
+sample_basenames:
+- test_N2_rep1
+- test_N2_rep2
+- test_lin15b_rep1
+- test_lin15b_rep2
+
+sample_groups:
+- N2
+- N2
+- lin-15b
+- lin-15b
+
+transcriptome:
+  class: File
+  path: reference/test_transcriptome_chrI.fa.gz
+
+gtf_annotation:
+  class: File
+  path: reference/test_annotation_chrI.gtf
+
+salmon_index_dir: reference/salmon_index
+
+run_directory: results_salmon
