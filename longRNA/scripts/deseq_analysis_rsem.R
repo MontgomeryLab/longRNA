@@ -10,12 +10,14 @@ suppressPackageStartupMessages({
   library(tximport)
   library(ggplot2)
   library(pheatmap)
+  library(readxl)
 })
 
 # Read command line arguments
 args <- commandArgs(trailingOnly = TRUE)
 gtf_file <- if (length(args) > 0) args[1] else "annotation.gtf"
 sample_csv_file <- if (length(args) > 1) args[2] else NULL
+geneid2name_file <- if (length(args) > 2) args[3] else NULL
 
 cat("=======================================================\n")
 cat("RNA-seq Gene-Level Analysis Pipeline (RSEM)\n")
@@ -301,6 +303,54 @@ write.table(normalized_counts_tsv, "gene_counts_normalized.tsv",
             sep = "\t", quote = FALSE, row.names = FALSE)
 cat(sprintf("  - gene_counts_normalized.tsv (%d genes, 3 decimal places)\n",
             nrow(normalized_counts_tsv) - 1))
+
+# Create gene name versions if geneid2name_file is provided
+if (!is.null(geneid2name_file) && file.exists(geneid2name_file)) {
+  cat(sprintf("\nReading gene ID to name mapping from: %s\n", geneid2name_file))
+
+  # Read the xlsx file
+  geneid2name <- read_excel(geneid2name_file)
+  colnames(geneid2name) <- c("gene_id", "gene_name")
+
+  cat(sprintf("Loaded %d gene ID to name mappings\n", nrow(geneid2name)))
+
+  # Function to convert gene IDs to gene names
+  convert_ids_to_names <- function(gene_ids, mapping) {
+    gene_names <- sapply(gene_ids, function(gid) {
+      idx <- which(mapping$gene_id == gid)
+      if (length(idx) > 0) {
+        return(mapping$gene_name[idx[1]])
+      } else {
+        return(gid)  # Keep original ID if no mapping found
+      }
+    })
+    return(as.character(gene_names))
+  }
+
+  # Create gene name versions
+  cat("Creating gene name count files...\n")
+
+  # Raw counts with gene names
+  genename_counts_raw <- gene_counts
+  genename_counts_raw$gene <- convert_ids_to_names(gene_counts$gene, geneid2name)
+  write.table(genename_counts_raw, "genename_counts_raw.tsv",
+              sep = "\t", quote = FALSE, row.names = FALSE)
+
+  # Normalized counts with gene names
+  genename_counts_normalized <- normalized_counts_tsv
+  genename_counts_normalized$gene <- convert_ids_to_names(normalized_counts_tsv$gene, geneid2name)
+  write.table(genename_counts_normalized, "genename_counts_normalized.tsv",
+              sep = "\t", quote = FALSE, row.names = FALSE)
+
+  # Count how many were converted
+  converted_count <- sum(genename_counts_raw$gene != gene_counts$gene)
+  cat(sprintf("  - genename_counts_raw.tsv (%d genes converted to names)\n", converted_count))
+  cat(sprintf("  - genename_counts_normalized.tsv (%d genes converted to names)\n", converted_count))
+} else {
+  if (!is.null(geneid2name_file)) {
+    cat(sprintf("\nWarning: geneid2name file not found: %s\n", geneid2name_file))
+  }
+}
 
 # Convert gene IDs to transcript IDs using tx2gene mapping
 if (file.exists("tx2gene_mapping.tsv")) {

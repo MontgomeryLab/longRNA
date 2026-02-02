@@ -5,14 +5,13 @@
 # All relative paths are evaluated relative to this file's directory (longRNA/).
 #
 # To run the pipeline:
-#   1. Edit this file to specify your input FASTQ files and reference files
+#   1. Edit samples.csv with your sample information
 #   2. Edit config_rsem.yml to adjust pipeline parameters
-#   3. Run: python3 runcwl_rsem.py
+#   3. Run: long rsem
 #
 ######-------------------------------------------------------------------------------------######
 
 ##-- Pipeline file locations (relative to this directory) --##
-workflow_file: cwl/workflows/rnaseq_rsem_workflow.cwl
 config_file: config_rsem.yml
 merged_config_file: processed_config_rsem.yml
 
@@ -20,87 +19,13 @@ merged_config_file: processed_config_rsem.yml
 tmp_directory: /home/shliu/cwl_tmp_rsem           # Temporary execution directory
 cache_directory: /home/shliu/cwl_cache_rsem       # Persistent cache directory
 
-##-- Sample CSV file (contains FASTQ filenames, sample groups, replicates, and control designation) --##
-##-- This file will be used by DESeq2 to perform condition-specific analyses --##
-sample_csv_file:
-  class: File
-  path: ../fastq/samples_wt.csv
+##-- Sample CSV file --##
+##-- Contains: Forward Reads, Reverse Reads, Sample/Group Name, Replicate Number, Control --##
+##-- All FASTQ paths in the CSV are relative to fastq_directory --##
+samples_csv: ../fastq/samples_wt.csv
 
-##-- Input FASTQ files (R1 - forward reads) --##
-##-- Paths are relative to longRNA/ directory (use ../ to go up one level) --##
-in_fastq_r1:
-- class: File
-  path: ../fastq/mRNA324_1.fq.gz
-- class: File
-  path: ../fastq/mRNA325_1.fq.gz
-- class: File
-  path: ../fastq/mRNA326_1.fq.gz
-- class: File
-  path: ../fastq/mRNA327_1.fq.gz
-- class: File
-  path: ../fastq/mRNA328_1.fq.gz
-- class: File
-  path: ../fastq/mRNA329_1.fq.gz
-- class: File
-  path: ../fastq/mRNA330_1.fq.gz
-- class: File
-  path: ../fastq/mRNA331_1.fq.gz
-- class: File
-  path: ../fastq/mRNA332_1.fq.gz
-- class: File
-  path: ../fastq/mRNA333_1.fq.gz
-
-##-- Input FASTQ files (R2 - reverse reads, for paired-end data) --##
-##-- Comment out this section if you have single-end data --##
-in_fastq_r2:
-- class: File
-  path: ../fastq/mRNA324_2.fq.gz
-- class: File
-  path: ../fastq/mRNA325_2.fq.gz
-- class: File
-  path: ../fastq/mRNA326_2.fq.gz
-- class: File
-  path: ../fastq/mRNA327_2.fq.gz
-- class: File
-  path: ../fastq/mRNA328_2.fq.gz
-- class: File
-  path: ../fastq/mRNA329_2.fq.gz
-- class: File
-  path: ../fastq/mRNA330_2.fq.gz
-- class: File
-  path: ../fastq/mRNA331_2.fq.gz
-- class: File
-  path: ../fastq/mRNA332_2.fq.gz
-- class: File
-  path: ../fastq/mRNA333_2.fq.gz
-
-##-- Sample names (basename without _1/_2 or _R1/_R2 suffix) --##
-##-- Must match the order of FASTQ files above --##
-sample_basenames:
-- mRNA324
-- mRNA325
-- mRNA326
-- mRNA327
-- mRNA328
-- mRNA329
-- mRNA330
-- mRNA331
-- mRNA332
-- mRNA333
-
-##-- Sample groups/conditions for differential expression analysis --##
-##-- Must match the order of FASTQ files above --##
-sample_groups:
-- N2
-- N2
-- lin-15b
-- lin-15b
-- lin-35
-- lin-35
-- lin-52
-- lin-52
-- lin-9
-- lin-9
+##-- Directory containing FASTQ files (paths in samples.csv are relative to this) --##
+fastq_directory: ../fastq/
 
 ##-- Reference genome file (FASTA format) --##
 genome_fasta:
@@ -111,6 +36,12 @@ genome_fasta:
 gtf_annotation:
   class: File
   path: ../reference/c_elegans.PRJNA13758.WS279.canonical_geneset_no-rRNA.gtf
+
+##-- Gene ID to gene name mapping file (Excel .xlsx format) --##
+##-- Expected columns: 'Your Input' (gene ID), 'Public Name' (gene name) --##
+geneid2name_file:
+  class: File
+  path: ../reference/geneid2name.xlsx
 
 ##-- Output directory for results --##
 run_directory: ../rsem_results

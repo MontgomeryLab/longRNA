@@ -75,6 +75,18 @@ else
 
   eval $RSEM_CMD > ${SAMPLE_NAME}.rsem.log 2> ${SAMPLE_NAME}.rsem.err
 
+  # Delete transcript BAM to save space (we only need genome BAM)
+  rm -f ${SAMPLE_NAME}.transcript.bam
+
+  # Sort genome BAM by coordinate and delete unsorted BAM to save space
+  echo "Sorting genome BAM..." >&2
+  if [ -f "${SAMPLE_NAME}.STAR.genome.bam" ]; then
+    samtools sort -@ $THREADS -o ${SAMPLE_NAME}.sorted.bam ${SAMPLE_NAME}.STAR.genome.bam
+    samtools index -@ $THREADS ${SAMPLE_NAME}.sorted.bam
+    rm -f ${SAMPLE_NAME}.STAR.genome.bam
+    echo "Sorted BAM created: ${SAMPLE_NAME}.sorted.bam" >&2
+  fi
+
   # Create temp directory with STAR log placeholders for CWL compatibility
   # In standard mode, RSEM runs STAR internally and doesn't output separate STAR logs
   [ -d ${SAMPLE_NAME}.temp ] && rm -rf ${SAMPLE_NAME}.temp

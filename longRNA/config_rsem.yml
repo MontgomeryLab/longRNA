@@ -22,7 +22,7 @@ is_paired_end: true  # Set to false for single-end data
 ##-- Output directory names --##
 dir_name_fastp: fastp_cleaned
 dir_name_rsem: rsem_quants
-dir_name_rsem_bams: rsem_bams
+dir_name_rsem_bams: sorted_bam
 dir_name_rsem_logs: rsem_logs
 dir_name_analysis: analysis_results_rsem
 dir_name_gene_counts: gene_counts_rsem

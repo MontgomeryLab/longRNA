@@ -82,10 +82,12 @@ outputs:
     outputBinding:
       glob: $(inputs.sample_name).isoforms.results
 
-  transcript_bam:
+  sorted_bam:
     type: File?
     outputBinding:
-      glob: $(inputs.sample_name).transcript.bam
+      glob: $(inputs.sample_name).sorted.bam
+    secondaryFiles:
+      - .bai
 
   stat_dir:
     type: Directory

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-longRNA - RNA-seq Analysis Pipeline (Salmon & RSEM)
+long - RNA-seq Analysis Pipeline (Salmon & RSEM)
 Setup script for installation
 """
 
@@ -40,7 +40,7 @@ setuptools.setup(
     python_requires=REQUIRES_PYTHON,
     entry_points={
         'console_scripts': [
-            'longRNA = longRNA.entry:main',
+            'long = longRNA.entry:main',
         ],
     },
     classifiers=[

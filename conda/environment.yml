@@ -25,6 +25,7 @@ dependencies:
 - conda-forge::r-dplyr
 - conda-forge::r-tidyr
 - conda-forge::r-readr
+- conda-forge::r-readxl
 
 # Additional utilities
 - bioconda::samtools>=1.15

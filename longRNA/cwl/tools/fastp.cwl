@@ -26,14 +26,14 @@ inputs:
     type: string
     inputBinding:
       prefix: -o
-      valueFrom: $(inputs.sample_name)_R1_clean.fastq
+      valueFrom: $(inputs.sample_name)_R1_clean.fastq.gz
     doc: "Output filename for cleaned R1 FASTQ"
-  
+
   output_name_r2:
     type: string?
     inputBinding:
       prefix: -O
-      valueFrom: $(inputs.sample_name)_R2_clean.fastq
+      valueFrom: $(inputs.sample_name)_R2_clean.fastq.gz
     doc: "Output filename for cleaned R2 FASTQ (paired-end only)"
   
   sample_name:
@@ -99,14 +99,14 @@ outputs:
   cleaned_fastq_r1:
     type: File
     outputBinding:
-      glob: $(inputs.sample_name)_R1_clean.fastq
-    doc: "Cleaned R1 FASTQ file"
-  
+      glob: $(inputs.sample_name)_R1_clean.fastq.gz
+    doc: "Cleaned R1 FASTQ file (gzip compressed)"
+
   cleaned_fastq_r2:
     type: File?
     outputBinding:
-      glob: $(inputs.sample_name)_R2_clean.fastq
-    doc: "Cleaned R2 FASTQ file (paired-end only)"
+      glob: $(inputs.sample_name)_R2_clean.fastq.gz
+    doc: "Cleaned R2 FASTQ file (gzip compressed, paired-end only)"
   
   html_report_file:
     type: File
